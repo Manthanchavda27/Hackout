@@ -1,0 +1,86 @@
+{
+  "name": "Investment",
+  "type": "object",
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "Name of the investment project"
+    },
+    "investor_name": {
+      "type": "string",
+      "description": "Name of the investing company"
+    },
+    "investment_type": {
+      "type": "string",
+      "enum": [
+        "equity",
+        "debt",
+        "grant",
+        "partnership"
+      ],
+      "description": "Type of investment"
+    },
+    "amount_required": {
+      "type": "number",
+      "description": "Investment amount required in USD"
+    },
+    "amount_committed": {
+      "type": "number",
+      "description": "Amount already committed"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "production",
+        "storage",
+        "distribution",
+        "research"
+      ]
+    },
+    "expected_capacity": {
+      "type": "number",
+      "description": "Expected hydrogen capacity"
+    },
+    "roi_projection": {
+      "type": "number",
+      "description": "Expected ROI percentage"
+    },
+    "timeline": {
+      "type": "string",
+      "description": "Project timeline"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "seeking_investors",
+        "funded",
+        "under_review",
+        "completed"
+      ],
+      "default": "seeking_investors"
+    },
+    "contact_email": {
+      "type": "string",
+      "format": "email"
+    }
+  },
+  "required": [
+    "project_name",
+    "amount_required",
+    "project_type"
+  ]
+}

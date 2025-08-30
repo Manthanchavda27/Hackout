@@ -1,0 +1,82 @@
+{
+  "name": "Infrastructure",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the infrastructure asset"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "plant",
+        "storage",
+        "pipeline",
+        "distribution_hub"
+      ],
+      "description": "Type of infrastructure"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "operational",
+        "planned",
+        "under_construction",
+        "maintenance"
+      ],
+      "description": "Current status"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    },
+    "capacity": {
+      "type": "number",
+      "description": "Production capacity in tonnes/day"
+    },
+    "efficiency": {
+      "type": "number",
+      "description": "Current efficiency percentage"
+    },
+    "energy_source": {
+      "type": "string",
+      "enum": [
+        "solar",
+        "wind",
+        "tidal",
+        "mixed"
+      ],
+      "description": "Primary energy source"
+    },
+    "investment_amount": {
+      "type": "number",
+      "description": "Total investment in USD"
+    },
+    "operational_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "status",
+    "location"
+  ]
+}

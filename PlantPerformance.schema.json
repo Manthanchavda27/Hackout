@@ -1,0 +1,104 @@
+{
+  "name": "PlantPerformance",
+  "type": "object",
+  "properties": {
+    "infrastructure_id": {
+      "type": "string",
+      "description": "Reference to infrastructure asset"
+    },
+    "production_rate": {
+      "type": "number",
+      "description": "Current production in kg/h"
+    },
+    "efficiency": {
+      "type": "number",
+      "description": "Current efficiency percentage"
+    },
+    "anode_condition": {
+      "type": "object",
+      "properties": {
+        "age_hours": {
+          "type": "number"
+        },
+        "efficiency": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "excellent",
+            "good",
+            "needs_maintenance",
+            "replace"
+          ]
+        }
+      }
+    },
+    "cathode_condition": {
+      "type": "object",
+      "properties": {
+        "age_hours": {
+          "type": "number"
+        },
+        "efficiency": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "excellent",
+            "good",
+            "needs_maintenance",
+            "replace"
+          ]
+        }
+      }
+    },
+    "storage_status": {
+      "type": "object",
+      "properties": {
+        "current_capacity": {
+          "type": "number"
+        },
+        "max_capacity": {
+          "type": "number"
+        },
+        "pressure": {
+          "type": "number"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "container_condition": {
+          "type": "string",
+          "enum": [
+            "excellent",
+            "good",
+            "needs_inspection",
+            "critical"
+          ]
+        }
+      }
+    },
+    "oxygen_output": {
+      "type": "number",
+      "description": "Oxygen byproduct in m³/h"
+    },
+    "energy_consumption": {
+      "type": "number",
+      "description": "Energy consumption in kWh"
+    },
+    "operating_hours": {
+      "type": "number",
+      "description": "Total operating hours"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "infrastructure_id",
+    "timestamp"
+  ]
+}

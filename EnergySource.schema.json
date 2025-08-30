@@ -1,0 +1,68 @@
+{
+  "name": "EnergySource",
+  "type": "object",
+  "properties": {
+    "location": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "solar_potential": {
+      "type": "number",
+      "description": "Solar irradiance in kWh/m²/day"
+    },
+    "wind_potential": {
+      "type": "number",
+      "description": "Average wind speed in m/s"
+    },
+    "tidal_potential": {
+      "type": "number",
+      "description": "Tidal range in meters"
+    },
+    "grid_connectivity": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "moderate",
+        "poor"
+      ]
+    },
+    "land_availability": {
+      "type": "number",
+      "description": "Available land in hectares"
+    },
+    "water_access": {
+      "type": "boolean",
+      "description": "Access to water for electrolysis"
+    },
+    "transport_connectivity": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "moderate",
+        "poor"
+      ]
+    },
+    "regulatory_zone": {
+      "type": "string",
+      "description": "Regulatory classification"
+    }
+  },
+  "required": [
+    "location"
+  ]
+}
