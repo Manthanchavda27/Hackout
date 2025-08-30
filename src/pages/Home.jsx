@@ -200,14 +200,18 @@ export default function HomePage() {
             </div>
             
             <div className="space-y-6">
-              {/* Video Placeholder */}
-              <div className="aspect-video bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/20"></div>
-                <div className="relative z-10 text-center text-white">
-                  <Play className="w-20 h-20 mx-auto mb-4 opacity-80" />
-                  <h4 className="text-2xl font-bold mb-2">Demo Video</h4>
-                  <p className="text-lg opacity-90">Understanding Hydrogen Wastage & Environmental Impact</p>
-                </div>
+              {/* Real YouTube Video */}
+              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/xtHlc7ZJBmw?autoplay=1&rel=0"
+                  title="HydroMap Demo: Understanding Hydrogen Wastage & Environmental Impact"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
               </div>
               
               {/* Video Content Description */}

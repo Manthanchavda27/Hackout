@@ -1,7 +1,7 @@
 import React, { useState, useContext, createContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Settings as SettingsIcon, Globe, Bell, Shield, User, Save, Moon, Sun, Waves, Zap } from "lucide-react";
+import { Globe, Bell, Shield, User, Save } from "lucide-react";
 import { useUser } from "../contexts/UserContext";
 
 // Currency and Theme Context
@@ -10,55 +10,12 @@ export const CurrencyContext = createContext();
 export const CurrencyProvider = ({ children }) => {
   const [currency, setCurrency] = useState('INR');
   const [currencySymbol, setCurrencySymbol] = useState('₹');
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('hydromap_theme');
-    return saved || 'light';
-  });
   
   const currencies = {
     'INR': { symbol: '₹', name: 'Indian Rupee', rate: 1, format: 'crore' },
     'USD': { symbol: '$', name: 'US Dollar', rate: 0.012, format: 'million' },
     'EUR': { symbol: '€', name: 'Euro', rate: 0.011, format: 'million' },
     'GBP': { symbol: '£', name: 'British Pound', rate: 0.0095, format: 'million' }
-  };
-
-  const themes = {
-    light: {
-      name: 'Light Mode',
-      background: 'from-slate-50 via-blue-50 to-green-50',
-      cardBg: 'bg-white/95',
-      textPrimary: 'text-slate-900',
-      textSecondary: 'text-slate-600',
-      border: 'border-white/20',
-      accent: 'from-green-600 to-blue-600'
-    },
-    dark: {
-      name: 'Dark Mode',
-      background: 'from-slate-900 via-blue-900 to-green-900',
-      cardBg: 'bg-slate-800/95',
-      textPrimary: 'text-white',
-      textSecondary: 'text-slate-300',
-      border: 'border-slate-700/50',
-      accent: 'from-green-400 to-blue-400'
-    },
-    ocean: {
-      name: 'Ocean Theme',
-      background: 'from-blue-900 via-teal-800 to-cyan-900',
-      cardBg: 'bg-blue-800/90',
-      textPrimary: 'text-cyan-50',
-      textSecondary: 'text-cyan-200',
-      border: 'border-cyan-500/30',
-      accent: 'from-cyan-400 to-teal-400'
-    },
-    forest: {
-      name: 'Forest Theme',
-      background: 'from-green-900 via-emerald-800 to-teal-900',
-      cardBg: 'bg-green-800/90',
-      textPrimary: 'text-green-50',
-      textSecondary: 'text-green-200',
-      border: 'border-green-500/30',
-      accent: 'from-emerald-400 to-green-400'
-    }
   };
 
   const formatCurrency = (amount) => {
@@ -89,25 +46,11 @@ export const CurrencyProvider = ({ children }) => {
     setCurrencySymbol(currencies[newCurrency].symbol);
   };
 
-  const changeTheme = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem('hydromap_theme', newTheme);
-    document.body.className = `theme-${newTheme}`;
-  };
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    changeTheme(newTheme);
-  };
-
-  React.useEffect(() => {
-    document.body.className = `theme-${theme}`;
-  }, [theme]);
 
   return (
     <CurrencyContext.Provider value={{ 
-      currency, currencySymbol, currencies, changeCurrency, 
-      theme, themes, changeTheme, toggleTheme, formatCurrency 
+      currency, currencySymbol, currencies, changeCurrency, formatCurrency 
     }}>
       {children}
     </CurrencyContext.Provider>
@@ -115,7 +58,7 @@ export const CurrencyProvider = ({ children }) => {
 };
 
 export default function Settings() {
-  const { currency, currencies, changeCurrency, theme, themes, changeTheme } = useContext(CurrencyContext);
+  const { currency, currencies, changeCurrency } = useContext(CurrencyContext);
   const { user, updateUser } = useUser();
   const [notifications, setNotifications] = useState({
     email: true,
@@ -149,7 +92,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-900">
                 <Globe className="w-5 h-5 text-green-500" />
-                Currency & Appearance
+                Currency & Region
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -170,35 +113,7 @@ export default function Settings() {
                   Current: {currencies[currency].symbol} {currencies[currency].name}
                 </p>
               </div>
-              
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-3 block">Theme Selection</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(themes).map(([key, themeData]) => (
-                    <div
-                      key={key}
-                      onClick={() => changeTheme(key)}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                        theme === key 
-                          ? 'border-green-500 bg-green-50' 
-                          : 'border-slate-300 bg-white hover:border-green-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        {key === 'light' && <Sun className="w-5 h-5 text-yellow-500" />}
-                        {key === 'dark' && <Moon className="w-5 h-5 text-blue-500" />}
-                        {key === 'ocean' && <Waves className="w-5 h-5 text-cyan-500" />}
-                        {key === 'forest' && <Zap className="w-5 h-5 text-green-500" />}
-                        <span className="font-medium text-slate-700">{themeData.name}</span>
-                      </div>
-                      <div className={`h-8 rounded bg-gradient-to-r ${themeData.background}`}></div>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-sm text-slate-500 mt-2">
-                  Current: {themes[theme].name}
-                </p>
-              </div>
+
             </CardContent>
           </Card>
 
