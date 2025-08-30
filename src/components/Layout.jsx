@@ -1,20 +1,25 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MapPin, BarChart3, Settings, Users, Zap, Bell, Search, Target } from "lucide-react";
+import { MapPin, BarChart3, Settings as SettingsIcon, Users, Zap, Bell, Search, Target, Factory, TrendingUp, LogOut, Crown } from "lucide-react";
+import { useUser } from "../contexts/UserContext";
 
 const navigationItems = [
-  { title: "Dashboard", url: "/Dashboard", icon: BarChart3, description: "Overview & Metrics" },
-  { title: "Infrastructure Map", url: "/Map", icon: MapPin, description: "Interactive Mapping" },
-  { title: "Plant Optimizer", url: "/Optimizer", icon: Settings, description: "Location Analysis" },
-  { title: "Advanced Optimizer", url: "/PlantOptimizer", icon: Target, description: "State-wise Analysis" },
-  { title: "Collaboration Hub", url: "/Collaboration", icon: Users, description: "Investments & Partners" },
-  { title: "Analytics", url: "/Analytics", icon: Zap, description: "Performance Tracking" },
+  { title: "Dashboard", url: "/dashboard", icon: BarChart3, description: "Overview & Metrics" },
+  { title: "Infrastructure Map", url: "/map", icon: MapPin, description: "Interactive Mapping" },
+  { title: "Factory Visualization", url: "/factory", icon: Factory, description: "Real-time Production" },
+  { title: "Investment Planning", url: "/investment-map", icon: TrendingUp, description: "Strategic Planning" },
+  { title: "Plant Optimizer", url: "/optimizer", icon: SettingsIcon, description: "Location Analysis" },
+  { title: "Advanced Optimizer", url: "/plant-optimizer", icon: Target, description: "State-wise Analysis" },
+  { title: "Collaboration Hub", url: "/collaboration", icon: Users, description: "Investments & Partners" },
+  { title: "Analytics", url: "/analytics", icon: Zap, description: "Performance Tracking" },
+  { title: "Settings", url: "/settings", icon: SettingsIcon, description: "Account & Preferences" },
 ];
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const { user, logout } = useUser();
   
-  const publicPages = ["/Home", "/Login", "/Signup"];
+  const publicPages = ["/", "/home", "/login", "/signup"];
   const isPublicPage = publicPages.includes(location.pathname) || location.pathname === "/";
   
   if (isPublicPage) {
@@ -70,13 +75,28 @@ export default function Layout({ children }) {
 
         <div className="p-4 border-t border-white/10">
           <div className="flex items-center gap-3 p-3 bg-white/60 rounded-xl">
-            <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-              U
+            <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold relative">
+              {user?.name?.charAt(0) || 'U'}
+              {user?.isCreator && (
+                <Crown className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-slate-900 truncate">Energy Analyst</p>
-              <p className="text-xs text-slate-500 truncate">Planning Team</p>
+              <p className="font-semibold text-sm text-slate-900 truncate">
+                {user?.name || 'Energy Analyst'}
+                {user?.isCreator && <span className="text-yellow-600 ml-1">👑</span>}
+              </p>
+              <p className="text-xs text-slate-500 truncate">
+                {user?.role || (user?.isCreator ? 'Creator & Founder' : 'Planning Team')}
+              </p>
             </div>
+            <button 
+              onClick={logout}
+              className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-200 group"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4 text-slate-500 group-hover:text-red-600" />
+            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Zap, Mail, Lock, Eye, EyeOff, User, Building, ArrowRight } from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signup } = useUser();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,8 +28,16 @@ export default function SignupPage() {
     setIsLoading(true);
     
     setTimeout(() => {
+      const fullName = `${formData.firstName} ${formData.lastName}`;
+      
+      signup({
+        name: fullName,
+        email: formData.email,
+        company: formData.company || 'Green Energy Solutions'
+      });
+      
       setIsLoading(false);
-      navigate('/Dashboard');
+      navigate('/dashboard');
     }, 2000);
   };
 

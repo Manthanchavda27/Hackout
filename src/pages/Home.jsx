@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Zap, MapPin, Users, BarChart3, Play, ChevronDown } from "lucide-react";
+import { ArrowRight, Zap, MapPin, Users, BarChart3, Play, ChevronDown, X } from "lucide-react";
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,14 +59,17 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/Login">
+              <Link to="/login">
                 <button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-6 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group inline-flex items-center">
                   Get Started
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
               
-              <button className="border-2 border-slate-300 hover:border-slate-400 px-8 py-6 rounded-xl text-lg font-semibold group inline-flex items-center">
+              <button 
+                onClick={() => setShowVideo(true)}
+                className="border-2 border-slate-300 hover:border-slate-400 px-8 py-6 rounded-xl text-lg font-semibold group inline-flex items-center"
+              >
                 <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
                 Watch Demo
               </button>
@@ -141,14 +145,14 @@ export default function HomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-12">
-              <Link to="/Signup">
+              <Link to="/signup">
                 <button className="bg-white text-slate-900 hover:bg-gray-100 px-10 py-6 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 group inline-flex items-center">
                   Start Free Trial
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
               
-              <Link to="/Login">
+              <Link to="/login">
                 <button className="border-2 border-white text-white hover:bg-white/10 px-10 py-6 rounded-xl text-lg font-bold">
                   View Live Demo
                 </button>
@@ -183,6 +187,104 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Demo Video Modal */}
+      {showVideo && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-2xl font-bold text-slate-900">HydroMap Demo: The Hydrogen Crisis</h3>
+              <button onClick={() => setShowVideo(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Video Placeholder */}
+              <div className="aspect-video bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <div className="relative z-10 text-center text-white">
+                  <Play className="w-20 h-20 mx-auto mb-4 opacity-80" />
+                  <h4 className="text-2xl font-bold mb-2">Demo Video</h4>
+                  <p className="text-lg opacity-90">Understanding Hydrogen Wastage & Environmental Impact</p>
+                </div>
+              </div>
+              
+              {/* Video Content Description */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="text-xl font-semibold text-slate-900">🚨 The Hydrogen Crisis</h4>
+                  <ul className="space-y-2 text-slate-700">
+                    <li>• <strong>2.3 million tons</strong> of hydrogen wasted annually in India</li>
+                    <li>• <strong>₹45,000 crores</strong> economic loss due to inefficient infrastructure</li>
+                    <li>• <strong>15% leakage rate</strong> in current hydrogen transportation</li>
+                    <li>• <strong>Carbon footprint</strong> equivalent to 8 million cars</li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-4">
+                  <h4 className="text-xl font-semibold text-slate-900">🌍 Environmental Impact</h4>
+                  <ul className="space-y-2 text-slate-700">
+                    <li>• <strong>Greenhouse Effect:</strong> Hydrogen is 11x more potent than CO₂</li>
+                    <li>• <strong>Ozone Depletion:</strong> Leaked H₂ affects atmospheric chemistry</li>
+                    <li>• <strong>Water Waste:</strong> 9 liters of water wasted per kg of lost hydrogen</li>
+                    <li>• <strong>Energy Loss:</strong> 50 MWh of renewable energy wasted daily</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-lg border-l-4 border-red-500">
+                <h4 className="text-xl font-semibold text-red-800 mb-3">⚠️ Critical Statistics</h4>
+                <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">23%</div>
+                    <div className="text-red-700">Infrastructure Inefficiency</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">₹1.2L Cr</div>
+                    <div className="text-orange-700">Annual Economic Loss</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-600">40Mt CO₂</div>
+                    <div className="text-red-700">Equivalent Emissions</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border-l-4 border-green-500">
+                <h4 className="text-xl font-semibold text-green-800 mb-3">✅ HydroMap Solution</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="font-semibold text-green-700 mb-2">Smart Infrastructure Mapping</h5>
+                    <ul className="text-sm text-green-600 space-y-1">
+                      <li>• Real-time leak detection</li>
+                      <li>• Optimal plant placement</li>
+                      <li>• Predictive maintenance</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-blue-700 mb-2">Investment Optimization</h5>
+                    <ul className="text-sm text-blue-600 space-y-1">
+                      <li>• AI-powered site selection</li>
+                      <li>• Risk assessment tools</li>
+                      <li>• ROI maximization</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <Link to="/signup">
+                  <button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center">
+                    Start Preventing Hydrogen Waste Today
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

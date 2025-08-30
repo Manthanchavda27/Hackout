@@ -1,8 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { BarChart3, TrendingUp, Zap, DollarSign, Calendar, Download } from "lucide-react";
+import { CurrencyContext } from "./Settings";
 
 export default function Analytics() {
+  const { currencySymbol, formatCurrency } = useContext(CurrencyContext);
   const [timeRange, setTimeRange] = useState('6months');
+  
+
+  
+  const downloadAnalyticsReport = () => {
+    const reportData = {
+      timeRange,
+      metrics: {
+        totalProduction: '8,550 t',
+        avgEfficiency: '87.2%',
+        investmentFlow: `${currencySymbol}${formatCurrency(2900000000)}`,
+        activeProjects: 80
+      },
+      regionalData: [
+        { name: 'Gujarat', value: 35 },
+        { name: 'Rajasthan', value: 28 },
+        { name: 'Tamil Nadu', value: 22 },
+        { name: 'Others', value: 15 }
+      ],
+      timestamp: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(reportData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'analytics-report.json';
+    link.click();
+  };
 
   const MetricCard = ({ title, value, subtitle, icon: Icon, trend, color }) => (
     <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-lg p-6">
@@ -44,7 +75,7 @@ export default function Analytics() {
               <option value="6months">Last 6 Months</option>
               <option value="1year">Last Year</option>
             </select>
-            <button className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-green-700 hover:to-blue-700 transition-all duration-300 inline-flex items-center">
+            <button onClick={downloadAnalyticsReport} className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-green-700 hover:to-blue-700 transition-all duration-300 inline-flex items-center">
               <Download className="w-4 h-4 mr-2" />
               Export Report
             </button>
@@ -68,7 +99,7 @@ export default function Analytics() {
           />
           <MetricCard
             title="Investment Flow"
-            value="$2.9B"
+            value={`${currencySymbol}${formatCurrency(2900000000)}`}
             icon={DollarSign}
             trend="+45% YoY growth"
             color="purple"
@@ -129,7 +160,7 @@ export default function Analytics() {
                           style={{ width: `${40 + index * 15}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm font-medium">${450 + index * 170}M</span>
+                      <span className="text-sm font-medium">{currencySymbol}{formatCurrency((450 + index * 170) * 1000000)}</span>
                     </div>
                   </div>
                 ))}

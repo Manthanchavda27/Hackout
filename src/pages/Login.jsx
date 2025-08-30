@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,8 +19,17 @@ export default function LoginPage() {
     setIsLoading(true);
     
     setTimeout(() => {
+      const name = formData.email === 'manthan@hydromap.com' ? 'Manthan Chavda' : 
+                   formData.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      
+      login({
+        name,
+        email: formData.email,
+        company: formData.email === 'manthan@hydromap.com' ? 'HydroMap Technologies' : 'Green Energy Solutions'
+      });
+      
       setIsLoading(false);
-      navigate('/Dashboard');
+      navigate('/dashboard');
     }, 1500);
   };
 

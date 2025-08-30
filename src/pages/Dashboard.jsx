@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Factory, Zap, TrendingUp, MapPin, DollarSign, Gauge, Sun } from "lucide-react";
+import React, { useState, useEffect, useContext } from "react";
+import { Factory, Zap, TrendingUp, MapPin, DollarSign, Gauge, Sun, Download } from "lucide-react";
+import { CurrencyContext } from "./Settings";
 import MetricCard from "../components/dashboard/MetricCard";
 import InfrastructureMap from "../components/dashboard/InfrastructureMap";
 import PerformanceChart from "../components/dashboard/PerformanceChart";
@@ -7,12 +8,65 @@ import AlertsPanel from "../components/dashboard/AlertsPanel";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 export default function Dashboard() {
+  const { currencySymbol, formatCurrency } = useContext(CurrencyContext);
   const [data, setData] = useState({
     plants: 47,
     capacity: 2340,
     investment: 2.8,
     efficiency: 89.2
   });
+  
+
+  
+  const downloadDashboardReport = () => {
+    const reportData = {
+      metrics: {
+        totalPlants: data.plants,
+        dailyCapacity: `${data.capacity} t/d`,
+        totalInvestment: `${currencySymbol}${formatCurrency(data.investment * 1000000000)}`,
+        avgEfficiency: `${data.efficiency}%`
+      },
+      infrastructure: mockInfrastructure,
+      performance: mockPerformance,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Create CSV format
+    const csvContent = [
+      ['Dashboard Report'],
+      ['Generated:', new Date().toLocaleString()],
+      [''],
+      ['Key Metrics'],
+      ['Total Plants', data.plants],
+      ['Daily Capacity', `${data.capacity} t/d`],
+      ['Total Investment', `${currencySymbol}${formatCurrency(data.investment * 1000000000)}`],
+      ['Average Efficiency', `${data.efficiency}%`],
+      [''],
+      ['Infrastructure Assets'],
+      ['Name', 'Location', 'Status', 'Capacity', 'Efficiency'],
+      ...mockInfrastructure.map(item => [
+        item.name, `${item.location.city}, ${item.location.state}`, 
+        item.status, `${item.capacity} t/d`, `${item.efficiency}%`
+      ])
+    ].map(row => Array.isArray(row) ? row.join(',') : row).join('\n');
+    
+    // Download CSV
+    const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+    const csvUrl = URL.createObjectURL(csvBlob);
+    const csvLink = document.createElement('a');
+    csvLink.href = csvUrl;
+    csvLink.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.csv`;
+    csvLink.click();
+    
+    // Download JSON
+    const dataStr = JSON.stringify(reportData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+  };
 
   useEffect(() => {
     // Simulate API call
@@ -66,13 +120,19 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-            Green Hydrogen Dashboard
-          </h1>
-          <p className="text-slate-600 text-lg">
-            Real-time monitoring and optimization of hydrogen infrastructure
-          </p>
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Green Hydrogen Dashboard
+            </h1>
+            <p className="text-slate-600 text-lg">
+              Real-time monitoring and optimization of hydrogen infrastructure
+            </p>
+          </div>
+          <button onClick={downloadDashboardReport} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+            <Download className="w-4 h-4" />
+            Download Report
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -94,7 +154,7 @@ export default function Dashboard() {
           />
           <MetricCard
             title="Total Investment"
-            value={`$${data.investment}B`}
+            value={`${currencySymbol}${formatCurrency(data.investment * 1000000000)}`}
             subtitle="Committed Capital"
             icon={DollarSign}
             trend="+45% YoY growth"

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Settings, MapPin, Zap, DollarSign, TrendingUp, Target, Sun, Wind, Waves, Award } from "lucide-react";
+import { Settings, MapPin, Zap, DollarSign, TrendingUp, Target, Sun, Wind, Waves, Award, Download } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { CurrencyContext } from "./Settings";
 
 export default function PlantOptimizer() {
+  const { currencySymbol, formatCurrency } = useContext(CurrencyContext);
   const [selectedCriteria, setSelectedCriteria] = useState({
     renewable_potential: true,
     infrastructure_proximity: true,
@@ -15,8 +17,30 @@ export default function PlantOptimizer() {
   });
 
   const [selectedEnergyType, setSelectedEnergyType] = useState('all');
-  const [optimizationResults, setOptimizationResults] = useState([]);
+  // const [optimizationResults, setOptimizationResults] = useState([]);
   const [stateAnalysis, setStateAnalysis] = useState([]);
+  
+
+  
+  const downloadOptimizationReport = () => {
+    const reportData = {
+      energyType: selectedEnergyType,
+      criteria: selectedCriteria,
+      stateAnalysis: stateAnalysis.map(state => ({
+        ...state,
+        investment: `${currencySymbol}${formatCurrency(state.investment * 1000000)}`
+      })),
+      timestamp: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(reportData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'optimization-report.json';
+    link.click();
+  };
 
   const stateOptimizationData = {
     solar: [
@@ -65,7 +89,7 @@ export default function PlantOptimizer() {
       investment_required: state.investment * 1000000
     }));
     
-    setOptimizationResults(results);
+    // setOptimizationResults(results);
   };
 
   const getEnergyIcon = (type) => {
@@ -82,13 +106,21 @@ export default function PlantOptimizer() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-            Advanced Plant Optimizer
-          </h1>
-          <p className="text-slate-600 text-lg">
-            AI-powered state-wise optimization analysis for hydrogen plant placement
-          </p>
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Advanced Plant Optimizer
+            </h1>
+            <p className="text-slate-600 text-lg">
+              AI-powered state-wise optimization analysis for hydrogen plant placement
+            </p>
+          </div>
+          {stateAnalysis.length > 0 && (
+            <Button onClick={downloadOptimizationReport} className="bg-green-600 hover:bg-green-700 text-white">
+              <Download className="w-4 h-4 mr-2" />
+              Download Report
+            </Button>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-4 gap-8">
@@ -251,7 +283,7 @@ export default function PlantOptimizer() {
                             <div className="flex items-center gap-2">
                               <DollarSign className="w-4 h-4 text-green-500" />
                               <span className="text-slate-600">Investment:</span>
-                              <span className="font-medium">${state.investment}M</span>
+                              <span className="font-medium">{currencySymbol}{formatCurrency(state.investment * 1000000)}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <TrendingUp className="w-4 h-4 text-blue-500" />
