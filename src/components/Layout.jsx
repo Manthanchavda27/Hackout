@@ -1,11 +1,10 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MapPin, BarChart3, Settings as SettingsIcon, Users, Zap, Bell, Search, Target, Factory, TrendingUp, LogOut, Crown } from "lucide-react";
+import { BarChart3, Settings as SettingsIcon, Users, Zap, Bell, Search, Target, Factory, TrendingUp, LogOut, Crown } from "lucide-react";
 import { useUser } from "../contexts/UserContext";
 
 const navigationItems = [
   { title: "Dashboard", url: "/dashboard", icon: BarChart3, description: "Overview & Metrics" },
-  { title: "Infrastructure Map", url: "/map", icon: MapPin, description: "Interactive Mapping" },
   { title: "Factory Visualization", url: "/factory", icon: Factory, description: "Real-time Production" },
   { title: "Investment Planning", url: "/investment-map", icon: TrendingUp, description: "Strategic Planning" },
   { title: "Plant Optimizer", url: "/optimizer", icon: SettingsIcon, description: "Location Analysis" },

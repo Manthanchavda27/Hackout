@@ -1,12 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import MapPage from './pages/Map';
-import EnhancedMap from './pages/EnhancedMap';
+
 import FactoryVisualization from './pages/FactoryVisualization';
 import InvestmentMap from './pages/InvestmentMap';
 import Optimizer from './pages/Optimizer';
@@ -28,7 +27,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/map" element={<EnhancedMap />} />
+            <Route path="/infrastructure-planning" element={<InvestmentMap />} />
             <Route path="/factory" element={<FactoryVisualization />} />
             <Route path="/investment-map" element={<InvestmentMap />} />
             <Route path="/optimizer" element={<Optimizer />} />

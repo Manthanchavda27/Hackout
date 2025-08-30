@@ -2,7 +2,7 @@
   "name": "hydromap-app",
   "version": "1.0.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://cmanthan.github.io/Hackout",
   "dependencies": {
     "clsx": "^2.0.0",
     "concurrently": "^8.2.0",

@@ -3,14 +3,20 @@ import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from "react-lea
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { MapPin, AlertTriangle, TrendingDown, Zap, Download, Filter, Eye, X } from "lucide-react";
+import { MapPin, AlertTriangle, TrendingDown, Zap, Download, Filter, Eye, X, Search, Settings, BarChart3, Users, Crown, Sliders } from "lucide-react";
 import { CurrencyContext } from "./Settings";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 import "leaflet/dist/leaflet.css";
 
 export default function EnhancedMap() {
   const { currencySymbol, formatCurrency } = useContext(CurrencyContext);
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [selectedFacility, setSelectedFacility] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSidebar, setShowSidebar] = useState(true);
 
   const hydrogenFacilities = [
     {
@@ -151,11 +157,14 @@ export default function EnhancedMap() {
   ];
 
   const getMarkerColor = (facility) => {
-    if (facility.status === 'critical') return '#EF4444';
-    if (facility.wastage.daily > 5) return '#F59E0B';
-    if (facility.efficiency < 70) return '#F97316';
+    if (facility.status === 'critical') return '#DC2626';
+    if (selectedFilter === 'high-wastage' && facility.wastage.daily > 4) return '#EA580C';
+    if (selectedFilter === 'low-efficiency' && facility.efficiency < 75) return '#D97706';
+    if (facility.type === 'production') return '#059669';
+    if (facility.type === 'storage') return '#2563EB';
+    if (facility.type === 'distribution') return '#7C3AED';
     if (facility.efficiency > 85) return '#10B981';
-    return '#3B82F6';
+    return '#6B7280';
   };
 
   const getMarkerSize = (facility) => {
@@ -163,11 +172,21 @@ export default function EnhancedMap() {
   };
 
   const filteredFacilities = hydrogenFacilities.filter(facility => {
+    const matchesSearch = searchTerm === '' || 
+      facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.location.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.location.state.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (!matchesSearch) return false;
+    
     if (selectedFilter === 'all') return true;
+    if (selectedFilter === 'production') return facility.type === 'production';
+    if (selectedFilter === 'storage') return facility.type === 'storage';
+    if (selectedFilter === 'distribution') return facility.type === 'distribution';
     if (selectedFilter === 'high-wastage') return facility.wastage.daily > 4;
     if (selectedFilter === 'critical') return facility.status === 'critical';
     if (selectedFilter === 'low-efficiency') return facility.efficiency < 75;
-    return facility.type === selectedFilter;
+    return false;
   });
 
   const totalWastage = hydrogenFacilities.reduce((sum, f) => sum + f.wastage.annual, 0);
@@ -206,23 +225,173 @@ export default function EnhancedMap() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              Hydrogen Infrastructure Map
-            </h1>
-            <p className="text-slate-600 text-lg">Real-time monitoring of hydrogen facilities and wastage analysis</p>
-          </div>
-          <Button onClick={downloadMapReport} className="bg-green-600 hover:bg-green-700 text-white">
-            <Download className="w-4 h-4 mr-2" />
-            Download Report
-          </Button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50">
+      <div className="flex h-screen">
+        {showSidebar && (
+          <div className="w-80 bg-white/95 backdrop-blur-sm border-r border-white/20 p-6 overflow-y-auto">
+            <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                  {user?.name === 'Manthan Chavda' ? (
+                    <Crown className="w-5 h-5 text-white" />
+                  ) : (
+                    <span className="text-white font-bold">{user?.name?.charAt(0) || 'U'}</span>
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-600">
+                    {user?.name === 'Manthan Chavda' ? 'Creator & Founder' : 'Infrastructure Analyst'}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search facilities..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <Filter className="w-4 h-4" />
+                Filter Categories
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { value: 'all', label: 'All Facilities', count: hydrogenFacilities.length },
+                  { value: 'production', label: 'Production Plants', count: hydrogenFacilities.filter(f => f.type === 'production').length },
+                  { value: 'storage', label: 'Storage Facilities', count: hydrogenFacilities.filter(f => f.type === 'storage').length },
+                  { value: 'distribution', label: 'Distribution Centers', count: hydrogenFacilities.filter(f => f.type === 'distribution').length },
+                  { value: 'high-wastage', label: 'High Wastage', count: hydrogenFacilities.filter(f => f.wastage.daily > 4).length },
+                  { value: 'critical', label: 'Critical Status', count: hydrogenFacilities.filter(f => f.status === 'critical').length },
+                  { value: 'low-efficiency', label: 'Low Efficiency', count: hydrogenFacilities.filter(f => f.efficiency < 75).length }
+                ].map((filter) => (
+                  <button
+                    key={filter.value}
+                    onClick={() => setSelectedFilter(filter.value)}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                      selectedFilter === filter.value
+                        ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                        : 'hover:bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    <span>{filter.label}</span>
+                    <Badge className="bg-slate-200 text-slate-700 text-xs">{filter.count}</Badge>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-slate-700 mb-3">Quick Access</h3>
+              
+              <button
+                onClick={() => navigate('/plant-optimizer')}
+                className="w-full text-left px-4 py-3 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-lg border border-green-200 transition-all duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <Sliders className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-800">Advanced Optimizer</p>
+                    <p className="text-xs text-green-600">AI-powered site selection</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate('/collaboration')}
+                className="w-full text-left px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-lg border border-blue-200 transition-all duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <Users className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium text-blue-800">Collaboration Hub</p>
+                    <p className="text-xs text-blue-600">Connect with partners</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate('/analytics')}
+                className="w-full text-left px-4 py-3 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-lg border border-purple-200 transition-all duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="w-5 h-5 text-purple-600" />
+                  <div>
+                    <p className="font-medium text-purple-800">Analytics</p>
+                    <p className="text-xs text-purple-600">Performance insights</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate('/settings')}
+                className="w-full text-left px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 rounded-lg border border-slate-200 transition-all duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="w-5 h-5 text-slate-600" />
+                  <div>
+                    <p className="font-medium text-slate-800">Settings</p>
+                    <p className="text-xs text-slate-600">Preferences & config</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200">
+              <h4 className="text-sm font-semibold text-red-800 mb-2">Live Alerts</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-red-700">Maharashtra Hub: Wastage spike detected</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                  <span className="text-orange-700">Karnataka Center: Efficiency below 60%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-full space-y-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowSidebar(!showSidebar)}
+                  className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                >
+                  <Filter className="w-5 h-5 text-slate-600" />
+                </button>
+                <div className="space-y-1">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                    Interactive Facility Map
+                  </h1>
+                  <p className="text-slate-600">Real-time monitoring • {filteredFacilities.length} facilities shown</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge className="bg-blue-100 text-blue-800">
+                  Filter: {selectedFilter.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </Badge>
+                <Button onClick={downloadMapReport} className="bg-green-600 hover:bg-green-700 text-white">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Data
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="glass-effect border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -272,51 +441,11 @@ export default function EnhancedMap() {
           </Card>
         </div>
 
-        {/* Filters */}
-        <Card className="glass-effect border-white/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
-              <Filter className="w-5 h-5 text-blue-500" />
-              Filter Facilities
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: 'all', label: 'All Facilities' },
-                { value: 'production', label: 'Production Plants' },
-                { value: 'storage', label: 'Storage Facilities' },
-                { value: 'distribution', label: 'Distribution Centers' },
-                { value: 'high-wastage', label: 'High Wastage (>4t/day)' },
-                { value: 'critical', label: 'Critical Status' },
-                { value: 'low-efficiency', label: 'Low Efficiency (<75%)' }
-              ].map((filter) => (
-                <Button
-                  key={filter.value}
-                  onClick={() => setSelectedFilter(filter.value)}
-                  className={`${
-                    selectedFilter === filter.value
-                      ? 'bg-green-600 text-white'
-                      : 'bg-white text-slate-700 border border-slate-300'
-                  } hover:bg-green-700 hover:text-white`}
-                >
-                  {filter.label}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Map */}
-        <Card className="glass-effect border-white/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-900">
-              <MapPin className="w-5 h-5 text-red-500" />
-              Interactive Facility Map
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-96 rounded-lg overflow-hidden">
+
+            <Card className="glass-effect border-white/20">
+              <CardContent className="p-0">
+                <div className="h-[600px] rounded-lg overflow-hidden relative">
               <MapContainer
                 center={[20.5937, 78.9629]}
                 zoom={5}
@@ -332,19 +461,32 @@ export default function EnhancedMap() {
                     center={[facility.location.lat, facility.location.lng]}
                     radius={getMarkerSize(facility)}
                     fillColor={getMarkerColor(facility)}
-                    color="#fff"
-                    weight={2}
+                    color={selectedFacility?.id === facility.id ? '#FFD700' : '#fff'}
+                    weight={selectedFacility?.id === facility.id ? 4 : 2}
                     opacity={1}
-                    fillOpacity={0.8}
+                    fillOpacity={0.9}
                     eventHandlers={{
-                      click: () => setSelectedFacility(facility)
+                      click: () => setSelectedFacility(facility),
+                      mouseover: (e) => {
+                        e.target.setStyle({ fillOpacity: 1, weight: 3 });
+                      },
+                      mouseout: (e) => {
+                        if (selectedFacility?.id !== facility.id) {
+                          e.target.setStyle({ fillOpacity: 0.9, weight: 2 });
+                        }
+                      }
                     }}
                   >
-                    <Tooltip>
-                      <div className="text-sm">
-                        <strong>{facility.name}</strong><br/>
-                        Wastage: {facility.wastage.daily} t/day<br/>
-                        Efficiency: {facility.efficiency}%
+                    <Tooltip permanent={selectedFacility?.id === facility.id}>
+                      <div className="text-sm font-medium">
+                        <strong className="text-slate-900">{facility.name}</strong><br/>
+                        <span className="text-red-600">Wastage: {facility.wastage.daily} t/day</span><br/>
+                        <span className="text-blue-600">Efficiency: {facility.efficiency}%</span>
+                        {facility.name === 'Maharashtra Industrial Hub' && (
+                          <div className="mt-1 text-xs text-purple-600 font-semibold">
+                            📍 Featured Facility
+                          </div>
+                        )}
                       </div>
                     </Tooltip>
                     <Popup>
@@ -370,9 +512,34 @@ export default function EnhancedMap() {
                   </CircleMarker>
                 ))}
               </MapContainer>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-white/20 z-[1000]">
+                    <h4 className="text-sm font-semibold text-slate-800 mb-2">Legend</h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-green-600"></div>
+                        <span>Production Plants</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                        <span>Storage Facilities</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-purple-600"></div>
+                        <span>Distribution Centers</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-600"></div>
+                        <span>Critical Status</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-orange-600"></div>
+                        <span>High Wastage</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
         {/* Facility Details Modal */}
         {selectedFacility && (
@@ -511,6 +678,8 @@ export default function EnhancedMap() {
             </div>
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );
